@@ -1,3 +1,5 @@
+const PORT: u16 = 8080;
+
 #[tokio::test]
 async fn health_check_works() {
     spawn_app().await;
@@ -5,7 +7,7 @@ async fn health_check_works() {
     let client = reqwest::Client::new();
 
     let resp = client
-        .get("http://127.0.0.1:8080/health_check")
+        .get(format!("http://127.0.0.1:{PORT}/health_check"))
         .send()
         .await
         .expect("Failed to execute request.");
@@ -15,7 +17,7 @@ async fn health_check_works() {
 }
 
 async fn spawn_app() {
-    let server = zero2prod::run().expect("Failed to bind address.");
+    let server = zero2prod::run(PORT).expect("Failed to bind address.");
 
     // tokio will spawn this as a background task
     let _ = tokio::spawn(server);
