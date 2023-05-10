@@ -12,3 +12,11 @@ reqwest = "0.11.17"
 
 [lib]
 path = "src/lib.rs"
+
+[[bin]]
+path = "src/main.rs"
+name = "zero2prod"
+
+[[bin]]
+path = "scripts/config.rs"
+name = "config"
