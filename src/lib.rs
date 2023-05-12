@@ -1,4 +1,4 @@
-use actix_web::{HttpResponse, HttpServer, App, web, dev::Server};
+use actix_web::{dev::Server, web, App, HttpResponse, HttpServer};
 
 async fn health_check() -> HttpResponse {
     HttpResponse::Ok().finish()
@@ -14,4 +14,3 @@ pub fn run(port: u16) -> Result<Server, std::io::Error> {
 
     Ok(server)
 }
-
