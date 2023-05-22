@@ -11,7 +11,7 @@ if ! [ -x "$(command -v sqlx)" ]; then
     echo >&2 "Error: ql is not installed."
     echo >&2 "Use:"
     echo >&2 "    cargo install --version='~0.6' sqlx-cli \
---no-default-features --features restls,postgres"
+--no-default-features --features rustls,postgres"
     echo >&2 "to isntall it."
     exit 1
 fi
