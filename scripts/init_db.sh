@@ -31,15 +31,18 @@ DB_PORT="${POSTGRES_PORT:=5433}"
 # Check if a custom host has been set, otherwise default to 'localhost'
 DB_HOST="${POSTGRES_HOST:=localhost}"
 
-# Launch postgres using Docker
-docker run \
-    -e POSTGRES_USER=${DB_USER} \
-    -e POSTGRES_PASSWORD=${DB_PASSWORD} \
-    -e POSTGRES_DB=${DB_NAME} \
-    -p "${DB_PORT}":5432 \
-    -d postgres \
-    postgres -N 1000
-    # the last line increases the max umber of connections for testing purposes
+if [[ -z "${SKIP_DOCKER}" ]]
+then
+    # Launch postgres using Docker
+    docker run \
+        -e POSTGRES_USER=${DB_USER} \
+        -e POSTGRES_PASSWORD=${DB_PASSWORD} \
+        -e POSTGRES_DB=${DB_NAME} \
+        -p "${DB_PORT}":5432 \
+        -d postgres \
+        postgres -N 1000
+        # the last line increases the max umber of connections for testing purposes
+fi
 
 # Ping Postgres until it is ready
 export PGPASSWORD="${DB_PASSWORD}"
@@ -53,3 +56,4 @@ done
 DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
 export DATABSE_URL
 sqlx database create --database-url ${DATABASE_URL}
+sqlx migrate run --database-url ${DATABASE_URL}
