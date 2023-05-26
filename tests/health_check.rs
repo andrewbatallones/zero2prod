@@ -1,7 +1,7 @@
 const PORT: u16 = 8080;
 
 async fn spawn_app() {
-    let server = zero2prod::run(PORT).expect("Failed to bind address.");
+    let server = zero2prod::startup::run(PORT).expect("Failed to bind address.");
 
     // tokio will spawn this as a background task
     let _ = tokio::spawn(server);
