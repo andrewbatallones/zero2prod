@@ -1,10 +1,19 @@
+use std::sync::Once;
+
+use sqlx::{PgConnection, Connection};
+use zero2prod::configuration::get_configuration;
+
 const PORT: u16 = 8080;
 
-async fn spawn_app() {
-    let server = zero2prod::startup::run(PORT).expect("Failed to bind address.");
+static INIT: Once = Once::new();
 
-    // tokio will spawn this as a background task
-    let _ = tokio::spawn(server);
+async fn spawn_app() {
+    INIT.call_once(|| {
+        let server = zero2prod::startup::run(PORT).expect("Failed to bind address.");
+
+        // tokio will spawn this as a background task
+        let _ = tokio::spawn(server);
+    });
 }
 
 fn base_url() -> String {
@@ -13,8 +22,6 @@ fn base_url() -> String {
 
 #[tokio::test]
 async fn health_check_works() {
-    // Only need to spawn app once per run as it will persist throughout the full test suite
-    // TODO: this may be moved to a pre-check before running tests
     spawn_app().await;
 
     let client = reqwest::Client::new();
@@ -31,6 +38,13 @@ async fn health_check_works() {
 
 #[tokio::test]
 async fn subscibe_returns_a_200_for_valid_form_data() {
+    spawn_app().await;
+    
+    let configuraation = get_configuration().expect("Failed to read configuration");
+    let connection_string = configuraation.database.connection_string();
+    let _ = PgConnection::connect(&connection_string)
+        .await
+        .expect("Failed to connect to Postgres.");
     let client = reqwest::Client::new();
 
     let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
@@ -47,6 +61,7 @@ async fn subscibe_returns_a_200_for_valid_form_data() {
 
 #[tokio::test]
 async fn subscribe_returns_a_400_when_data_is_missing() {
+    spawn_app().await;
     let client = reqwest::Client::new();
     let test_cases = vec![
         ("name=le%20guin", "missing the email"),
@@ -71,3 +86,4 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
         )
     }
 }
+
