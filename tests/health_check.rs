@@ -8,8 +8,15 @@ const PORT: u16 = 8080;
 static INIT: Once = Once::new();
 
 async fn spawn_app() {
+    let configuraation = get_configuration().expect("Failed to read configuration");
+    let connection_string = configuraation.database.connection_string();
+    let connection = PgConnection::connect(&connection_string)
+        .await
+        .expect("Failed to connect to Postgres.");
+    
     INIT.call_once(|| {
-        let server = zero2prod::startup::run(PORT).expect("Failed to bind address.");
+
+        let server = zero2prod::startup::run(PORT, connection).expect("Failed to bind address.");
 
         // tokio will spawn this as a background task
         let _ = tokio::spawn(server);
@@ -42,7 +49,7 @@ async fn subscibe_returns_a_200_for_valid_form_data() {
     
     let configuraation = get_configuration().expect("Failed to read configuration");
     let connection_string = configuraation.database.connection_string();
-    let _ = PgConnection::connect(&connection_string)
+    let mut connection = PgConnection::connect(&connection_string)
         .await
         .expect("Failed to connect to Postgres.");
     let client = reqwest::Client::new();
@@ -57,6 +64,14 @@ async fn subscibe_returns_a_200_for_valid_form_data() {
         .expect("Failed to execute request.");
 
     assert_eq!(200, response.status().as_u16());
+
+    let saved = sqlx::query!("SELECT email, name FROM subscriptions",)
+        .fetch_one(&mut connection)
+        .await
+        .expect("Failed to fetch saved subscription.");
+
+    assert_eq!(saved.email, "ursula_le_guin@gmail.com");
+    assert_eq!(saved.name, "le guin");
 }
 
 #[tokio::test]
