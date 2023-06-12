@@ -1,6 +1,6 @@
 use std::sync::Once;
 
-use sqlx::{PgConnection, Connection};
+use sqlx::{Connection, PgConnection};
 use zero2prod::configuration::get_configuration;
 
 const PORT: u16 = 8080;
@@ -13,9 +13,8 @@ async fn spawn_app() {
     let connection = PgConnection::connect(&connection_string)
         .await
         .expect("Failed to connect to Postgres.");
-    
-    INIT.call_once(|| {
 
+    INIT.call_once(|| {
         let server = zero2prod::startup::run(PORT, connection).expect("Failed to bind address.");
 
         // tokio will spawn this as a background task
@@ -46,7 +45,7 @@ async fn health_check_works() {
 #[tokio::test]
 async fn subscibe_returns_a_200_for_valid_form_data() {
     spawn_app().await;
-    
+
     let configuraation = get_configuration().expect("Failed to read configuration");
     let connection_string = configuraation.database.connection_string();
     let mut connection = PgConnection::connect(&connection_string)
@@ -101,4 +100,3 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
         )
     }
 }
-
