@@ -9,7 +9,7 @@ fi
 
 if ! [ -x "$(command -v sqlx)" ]; then
     echo >&2 "Error: ql is not installed."
-    echo >&2 "Use:"
+    echo >&2 "Use: " # For some reason having a space here fixes syntax highlighting
     echo >&2 "    cargo install --version='~0.6' sqlx-cli \
 --no-default-features --features rustls,postgres"
     echo >&2 "to isntall it."
