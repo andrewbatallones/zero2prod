@@ -13,7 +13,7 @@ reqwest = "0.11.24"
 serde = { version = "1.0.197", features = ["derive"] }
 config = "0.14.0"
 chrono = "0.4.34"
-uuid = "1.7.0"
+uuid = { version = "1.7.0", features = ["v4"] }
 
 [dependencies.sqlx]
 version = "^0.7.3"
