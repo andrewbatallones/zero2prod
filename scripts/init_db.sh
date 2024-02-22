@@ -33,15 +33,7 @@ DB_HOST="${POSTGRES_HOST:=localhost}"
 
 if [[ -z "${SKIP_DOCKER}" ]]
 then
-    # Launch postgres using Docker
-    docker run \
-        -e POSTGRES_USER=${DB_USER} \
-        -e POSTGRES_PASSWORD=${DB_PASSWORD} \
-        -e POSTGRES_DB=${DB_NAME} \
-        -p "${DB_PORT}":5432 \
-        -d postgres \
-        postgres -N 1000
-        # the last line increases the max umber of connections for testing purposes
+    docker compose up -d
 fi
 
 # Ping Postgres until it is ready
@@ -53,7 +45,5 @@ done
 
 >&2 echo "Postgres is up and runnin on  port ${DB_PORT}!"
 
-DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
-export DATABSE_URL
 sqlx database create --database-url ${DATABASE_URL}
 sqlx migrate run --database-url ${DATABASE_URL}
