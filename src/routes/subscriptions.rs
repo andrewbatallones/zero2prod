@@ -10,6 +10,7 @@ pub struct FormData {
 }
 
 pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> HttpResponse {
+    // `r#`: Rust String Literals: https://doc.rust-lang.org/reference/tokens.html#raw-string-literals
     match sqlx::query!(
         r#"
          INSERT INTO subscriptions (id, email, name, subscribed_at)
