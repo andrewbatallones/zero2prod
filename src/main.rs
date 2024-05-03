@@ -3,6 +3,7 @@ use std::net::TcpListener;
 use sqlx::PgPool;
 use tracing::dispatcher::set_global_default;
 use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
+use tracing_log::LogTracer;
 use tracing_subscriber::{layer::SubscriberExt, EnvFilter, Registry};
 use zero2prod::{configuration::get_configuration, startup::run};
 
@@ -11,6 +12,9 @@ async fn main() -> Result<(), std::io::Error> {
     // This will make use of the log crate trait to start outputting log information.
     // This will be replaced with the tracing logic
     // env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
+    
+    // Redirect all log's events to the subscriber
+    LogTracer::init().expect("failed to set logger");
 
     // Sets the level of logging (default is "info")
     let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
