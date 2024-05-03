@@ -1,6 +1,7 @@
 use actix_web::{web, HttpResponse};
 use chrono::Utc;
 use sqlx::PgPool;
+use tracing::Instrument;
 use uuid::Uuid;
 
 #[derive(serde::Deserialize)]
@@ -27,6 +28,8 @@ pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> Ht
     // Look up Resource Acquisition Is Initialization (RAII)
     let _request_span_guard = request_span.enter();
 
+    // Don't need to call .enter() on this query_span, .instrument will take caure of it
+    let query_span = tracing::info_span!("Saving new subscriber details in the database");
     // `r#`: Rust String Literals: https://doc.rust-lang.org/reference/tokens.html#raw-string-literals
     match sqlx::query!(
         r#"
@@ -39,6 +42,7 @@ pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> Ht
         Utc::now()
     )
     .execute(pool.get_ref())
+    .instrument(query_span)
     .await
     {
         Ok(_) => {
