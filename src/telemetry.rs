@@ -1,17 +1,29 @@
 use tracing::{dispatcher::set_global_default, Subscriber};
 use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
 use tracing_log::LogTracer;
-use tracing_subscriber::{layer::SubscriberExt, EnvFilter, Registry};
+use tracing_subscriber::{fmt::MakeWriter, layer::SubscriberExt, EnvFilter, Registry};
 
-pub fn get_subscriber(name: String, env_filter: &str) -> impl Subscriber + Sync + Send {
+pub fn get_subscriber<Sink>(
+    name: String,
+    env_filter: &str,
+    sink: Sink,
+) -> impl Subscriber + Sync + Send
+where
+    // This is a higher-ranked trait bound (HRTB)
+    // Means that Sink implements the `MakeWriter` trait
+    // for all choices of the lifetime parameter
+    // https://doc.rust-lang.org/nomicon/hrtb.html
+    Sink: for<'a> MakeWriter<'a> + Send + Sync + 'static,
+{
     // This will make use of the log crate trait to start outputting log information.
     // This will be replaced with the tracing logic
     // env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
     // Sets the level of logging (default is "info")
-    let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(env_filter));
+    let env_filter =
+        EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(env_filter));
     // This sets how the logger will be formatted?
-    let formatting_layer = BunyanFormattingLayer::new(name.into(), std::io::stdout);
+    let formatting_layer = BunyanFormattingLayer::new(name, sink);
     Registry::default()
         .with(env_filter)
         .with(JsonStorageLayer)
