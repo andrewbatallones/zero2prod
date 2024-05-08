@@ -28,6 +28,7 @@ pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> Ht
     }
 }
 
+#[tracing::instrument(name = "Creating new subscriber to database", skip(form, pool))]
 async fn create_subscriber(pool: &PgPool, form: &FormData) -> Result<(), sqlx::Error> {
     sqlx::query!(
         r#"
