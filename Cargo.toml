@@ -8,6 +8,7 @@ default-run = "zero2prod"
 
 [dependencies]
 actix-web = "4.5.1"
+tracing-actix-web = "0.7.10"
 tokio = { version = "1.36.0", features = ["full"] }
 reqwest = "0.11.24"
 serde = { version = "1.0.197", features = ["derive"] }

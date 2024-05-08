@@ -16,7 +16,6 @@ pub struct FormData {
     skip(form, pool),
     fields(
         // `%` using that symbol is telling tracing to use their Display implementation for logging.
-        request_id = %Uuid::new_v4(),
         subscriber_email = %form.email,
         subscriber_name = %form.name
         )
