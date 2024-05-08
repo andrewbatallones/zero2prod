@@ -26,9 +26,6 @@ pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> Ht
         Ok(_) => HttpResponse::Ok().finish(),
         Err(_) => HttpResponse::InternalServerError().finish(),
     }
-
-    // Once done, the trace span will exit()
-    // You can enter/exit multiple times, but close only once.
 }
 
 async fn create_subscriber(pool: &PgPool, form: &FormData) -> Result<(), sqlx::Error> {
