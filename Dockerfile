@@ -6,7 +6,7 @@ RUN apt update && apt install lld clang -y
 
 COPY . .
 
-ENV SQLX_OFFLINE true
+ENV APPP_ENVIRONMENT production
 
 RUN cargo build --release
 
