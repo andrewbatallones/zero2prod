@@ -8,7 +8,7 @@ if ! [ -x "$(command -v psql)" ]; then
 fi
 
 if ! [ -x "$(command -v sqlx)" ]; then
-    echo >&2 "Error: ql is not installed."
+    echo >&2 "Error: sqlx is not installed."
     echo >&2 "Use: " # For some reason having a space here fixes syntax highlighting
     echo >&2 "    cargo install --version='~0.6' sqlx-cli \
 --no-default-features --features rustls,postgres"
@@ -16,8 +16,8 @@ if ! [ -x "$(command -v sqlx)" ]; then
     exit 1
 fi
 
-# Check if a custom user has been set, otherwise set it to 'postgres'
-DB_USER=${POSTGRES_USER:=postgres}
+# Check if a custom user has been set, otherwise set it to 'newsletter'
+DB_USER=${POSTGRES_USER:=newsletter}
 
 # Check if a custom password has been set, otherwise set it to 'password'
 DB_PASSWORD="${POSTGRES_PASSWORD:=password}"
@@ -26,7 +26,7 @@ DB_PASSWORD="${POSTGRES_PASSWORD:=password}"
 DB_NAME="${POSTGRES_DB:=newsletter}"
 
 # Check if a cuustom port has been set, otherwise default to '5432'
-DB_PORT="${POSTGRES_PORT:=5433}"
+DB_PORT="${POSTGRES_PORT:=5432}"
 
 # Check if a custom host has been set, otherwise default to 'localhost'
 DB_HOST="${POSTGRES_HOST:=localhost}"
